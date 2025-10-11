@@ -18,40 +18,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.artificery.llm_client.impl.GeminiLLMClientConfig
-import org.artificery.llm_client.impl.GeminiLLMClientImpl
-import org.artificery.llm_client.impl.GeminiModel
 import org.artificery.llm_client.model.TextPrompt
-import org.artificery.llm_client.model.TextResponse
-import org.artificery.llmclientsample.BuildConfig
+import org.artificery.llmclientsample.presentation.viewmodel.SharedSampleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextPromptScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: SharedSampleViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var responseText by remember { mutableStateOf("Loading...") }
 
     LaunchedEffect(Unit) {
-        val geminiLLMClientConfig = GeminiLLMClientConfig(
-            model = GeminiModel.GEMINI_2_5_FLASH,
-            apiKey = BuildConfig.GEMINI_API_KEY
-        )
-        val llmClient = GeminiLLMClientImpl(geminiLLMClientConfig)
-        val textPrompt = TextPrompt(text = "Write an Acrostic poem about programming using the word 'Code'")
-
-        responseText = withContext(Dispatchers.IO) {
-            when (val response = llmClient.getTextResponseFromTextPrompt(textPrompt)) {
-                is TextResponse.Success -> response.text
-                is TextResponse.Error -> "Error: ${response.message}"
-            }
-        }
+        val textPrompt = TextPrompt(text = "Write a deadpan Acrostic poem about programming using the word 'Code'")
+        responseText = viewModel.textPrompt(textPrompt)
     }
 
     Scaffold(
