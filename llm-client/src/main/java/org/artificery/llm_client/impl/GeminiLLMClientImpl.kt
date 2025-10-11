@@ -1,10 +1,15 @@
 package org.artificery.llm_client.impl
 
 import com.google.genai.Client
+import com.google.genai.types.Content
+import com.google.genai.types.FileData
+import com.google.genai.types.Part
 import org.artificery.llm_client.LLMClient
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
 import org.artificery.llm_client.model.toStringPrompt
+import java.io.File
+import java.net.URI
 
 class GeminiLLMClientImpl(
     private val config: GeminiLLMClientConfig
@@ -25,8 +30,26 @@ class GeminiLLMClientImpl(
         }
     }
 
-    override fun transcribeAudioToText(): TextResponse {
-        geminiClient.models.generateContent()
+    override fun transcribeAudioToText(audioFileUri: URI): TextResponse {
+
+        val audioPart = Part.builder().fileData(
+            FileData.builder().fileUri(audioFileUri.path)
+        )
+        val contents = Content.builder()
+            .role("transcriber")
+            .parts(audioPart)
+            .build()
+        val transcriptionResponse = geminiClient.models.generateContent(
+            config.model.modelName,
+            contents,
+            null
+        )
+
+        return if (transcriptionResponse.text() == null) {
+            TextResponse.Error("No text in response")
+        } else {
+            TextResponse.Success(transcriptionResponse.text() ?: "")
+        }
     }
 }
 
