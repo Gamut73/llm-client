@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation.NavController
+import org.artificery.llm_client.model.Example
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llmclientsample.presentation.viewmodel.SharedSampleViewModel
 
@@ -32,7 +32,14 @@ fun TextPromptScreen(
     var responseText by remember { mutableStateOf("Loading...") }
 
     LaunchedEffect(Unit) {
-        val textPrompt = TextPrompt(text = "Write a deadpan Acrostic poem about programming using the word 'Code'")
+        val example = Example(
+            input = "Bug",
+            output = "Build a feature\n Users find something wrong\n Goat farming looks attractive again"
+        )
+        val textPrompt = TextPrompt(
+            text = "Write a deadpan Acrostic poem about programming using the word 'Code'",
+            examples = listOf(example)
+        )
         responseText = viewModel.textPrompt(textPrompt)
     }
 
@@ -54,7 +61,7 @@ fun TextPromptScreen(
         }
     ) { innerPadding ->
         Text(
-            text = "LLM response: $responseText",
+            text = responseText,
             modifier = Modifier.padding(innerPadding)
         )
     }

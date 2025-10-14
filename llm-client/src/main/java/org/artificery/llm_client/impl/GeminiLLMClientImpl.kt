@@ -3,8 +3,8 @@ package org.artificery.llm_client.impl
 import com.google.genai.Client
 import com.google.genai.types.Content
 import com.google.genai.types.Part
-import org.artificery.llm_client.AudioMimeType
 import org.artificery.llm_client.LLMClient
+import org.artificery.llm_client.model.AudioMimeType
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
 import org.artificery.llm_client.model.toStringPrompt

@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.artificery.llm_client.AudioMimeType
 import org.artificery.llm_client.LLMClient
+import org.artificery.llm_client.model.AudioMimeType
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
 import javax.inject.Inject
