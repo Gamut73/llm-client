@@ -2,14 +2,12 @@ package org.artificery.llm_client.impl
 
 import com.google.genai.Client
 import com.google.genai.types.Content
-import com.google.genai.types.FileData
 import com.google.genai.types.Part
+import org.artificery.llm_client.AudioMimeType
 import org.artificery.llm_client.LLMClient
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
 import org.artificery.llm_client.model.toStringPrompt
-import java.io.File
-import java.net.URI
 
 class GeminiLLMClientImpl(
     private val config: GeminiLLMClientConfig
@@ -30,18 +28,17 @@ class GeminiLLMClientImpl(
         }
     }
 
-    override fun transcribeAudioToText(audioFileUri: URI): TextResponse {
-
-        val audioPart = Part.builder().fileData(
-            FileData.builder().fileUri(audioFileUri.path)
-        )
-        val contents = Content.builder()
-            .role("transcriber")
-            .parts(audioPart)
+    override fun transcribeAudioToText(audioBytes: ByteArray, audioMimeType: AudioMimeType): TextResponse {
+        val audioPart = Part.fromBytes(audioBytes, audioMimeType.mimeType)
+        val textPart = Part.fromText("Transcribe the audio to text.")
+        val content = Content.builder()
+            .role("user")
+            .parts(mutableListOf(textPart, audioPart))
             .build()
+
         val transcriptionResponse = geminiClient.models.generateContent(
             config.model.modelName,
-            contents,
+            content,
             null
         )
 

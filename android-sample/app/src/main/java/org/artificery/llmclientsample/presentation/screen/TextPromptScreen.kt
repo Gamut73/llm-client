@@ -26,7 +26,6 @@ import org.artificery.llmclientsample.presentation.viewmodel.SharedSampleViewMod
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextPromptScreen(
-    navController: NavController,
     viewModel: SharedSampleViewModel = hiltViewModel()
 ) {
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher

@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import org.artificery.llmclientsample.presentation.screen.HomeScreen
 import org.artificery.llmclientsample.presentation.screen.TextPromptScreen
+import org.artificery.llmclientsample.presentation.screen.TranscriptionScreen
 import org.artificery.llmclientsample.ui.theme.LLMClientSampleTheme
 
 @AndroidEntryPoint
@@ -25,7 +26,10 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(navController = navController)
                     }
                     composable("textPrompt") {
-                        TextPromptScreen(navController = navController)
+                        TextPromptScreen()
+                    }
+                    composable("transcription") {
+                        TranscriptionScreen()
                     }
                 }
             }

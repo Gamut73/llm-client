@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LLM Client Sample"
-include(":app")
+rootProject.name = "LLM Client"
+include(":android-sample:app")
 include(":llm-client")
