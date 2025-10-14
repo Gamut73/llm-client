@@ -1,6 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
+    id("com.vanniktech.maven.publish") version "0.34.0"
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -14,4 +15,40 @@ kotlin {
 
 dependencies {
     implementation(libs.google.genai)
+}
+
+mavenPublishing {
+    coordinates("io.github.gamut73", "llm_client", "1.0.0")
+
+    pom {
+        name.set("LLM Client Library")
+        description.set("Kotlin library for different llm implementations")
+        inceptionYear.set("2025")
+        url.set("https://github.com/Gamut73/llm-client")
+
+        licenses {
+            license {
+                name.set("MIT")
+                url.set("https://opensource.org/licenses/MIT")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("Gamut73")
+                name.set("Fitzcaraldo")
+                email.set("lilwaltmus@gmail.com")
+            }
+        }
+
+        scm {
+            url.set("https://github.com/Gamut73/llm-client")
+            connection.set("scm:git:git://github.com/Gamut73/llm-client.git")
+            developerConnection.set("scm:git:ssh://git@github.com/Gamut73/llm-client.git")
+        }
+    }
+
+    publishToMavenCentral()
+
+    signAllPublications()
 }
