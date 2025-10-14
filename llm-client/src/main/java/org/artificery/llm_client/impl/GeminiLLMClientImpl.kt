@@ -4,10 +4,12 @@ import com.google.genai.Client
 import com.google.genai.types.Content
 import com.google.genai.types.Part
 import org.artificery.llm_client.LLMClient
-import org.artificery.llm_client.model.AudioMimeType
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
+import org.artificery.llm_client.model.TextWithImagesPrompt
+import org.artificery.llm_client.model.enums.AudioMimeType
 import org.artificery.llm_client.model.toStringPrompt
+import java.net.URI
 
 class GeminiLLMClientImpl(
     private val config: GeminiLLMClientConfig
@@ -18,6 +20,40 @@ class GeminiLLMClientImpl(
         val generateContent = geminiClient.models.generateContent(
             config.model.modelName,
             prompt.toStringPrompt(),
+            null
+        )
+
+        return if (generateContent.text() == null) {
+            TextResponse.Error("No text in response")
+        } else {
+            TextResponse.Success(generateContent.text() ?: "")
+        }
+    }
+
+    override fun getTextResponseFromTextWithImagesPrompt(
+        prompt: TextWithImagesPrompt
+    ): TextResponse {
+        val parts = mutableListOf<Part>()
+        parts.add(Part.fromText(prompt.text))
+        prompt.imagesFromUrls.forEach { imageFromUrl ->
+            val url = URI(imageFromUrl.imageUrl).toURL()
+            parts.add(
+                Part.fromBytes(url.readBytes(), imageFromUrl.mimeType.mimeType)
+            )
+        }
+        prompt.imagesBytes.forEach { imageFromBytes ->
+            parts.add(
+                Part.fromBytes(imageFromBytes.imageBytes, imageFromBytes.mimeType.mimeType)
+            )
+        }
+        val content = Content.builder()
+            .role("user")
+            .parts(parts)
+            .build()
+
+        val generateContent = geminiClient.models.generateContent(
+            config.model.modelName,
+            content,
             null
         )
 

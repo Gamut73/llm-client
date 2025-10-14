@@ -3,15 +3,22 @@ package org.artificery.llmclientsample.presentation.viewmodel
 import android.content.ContentResolver
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.artificery.llm_client.LLMClient
-import org.artificery.llm_client.model.AudioMimeType
+import org.artificery.llm_client.model.ImageFromBytes
+import org.artificery.llm_client.model.ImageFromUrl
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
+import org.artificery.llm_client.model.enums.AudioMimeType
+import org.artificery.llm_client.model.enums.ImageMimeType
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,12 +36,45 @@ class SharedSampleViewModel @Inject constructor(
         }
     }
 
+    suspend fun textWithImagesPrompt(
+        prompt: TextPrompt,
+        imageUrls: List<String>,
+        imagesURIs: List<Uri>,
+        contentResolver: ContentResolver,
+    ): String {
+        val imagesFromUrls = imageUrls.map { url ->
+            val mimeType = getMimeTypeFromUrl(url)
+            ImageFromUrl(
+                imageUrl = url,
+                mimeType = mapMimeTypeToImageMimeType(mimeType)
+            )
+        }
+        val imagesBytes = imagesURIs.map { imageUri ->
+            ImageFromBytes(
+                imageBytes = getBytesFromUri(contentResolver, imageUri),
+                mimeType =
+                    mapMimeTypeToImageMimeType(contentResolver.getType(imageUri))
+            )
+        }
+        val response = withContext(Dispatchers.IO) {
+            llmClient.getTextResponseFromTextWithImagesPrompt(
+                org.artificery.llm_client.model.TextWithImagesPrompt(
+                    text = prompt.text,
+                    imagesFromUrls = imagesFromUrls,
+                    imagesBytes = imagesBytes
+                )
+            )
+        }
+        return when (response) {
+            is TextResponse.Success -> response.text
+            is TextResponse.Error -> "Error: ${response.message}"
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     suspend fun transcribeAudioToText(audioFileUri: Uri, contentResolver: ContentResolver): String {
         val response = withContext(Dispatchers.IO) {
-            val audioBytes = contentResolver.openInputStream(audioFileUri)?.use { inputStream ->
-                inputStream.readBytes()
-            } ?: throw IllegalArgumentException("Could not open audio file")
+            val audioBytes = getBytesFromUri(contentResolver, audioFileUri)
 
             llmClient.transcribeAudioToText(
                 audioBytes,
@@ -47,6 +87,13 @@ class SharedSampleViewModel @Inject constructor(
         }
     }
 
+    private fun getBytesFromUri(
+        contentResolver: ContentResolver,
+        fileUri: Uri
+    ): ByteArray = contentResolver.openInputStream(fileUri)?.use { inputStream ->
+        inputStream.readBytes()
+    } ?: throw IllegalArgumentException("Could not open file")
+
     private fun mapMimeTypeToAudioMimeType(mimeType: String?): AudioMimeType {
         return when (mimeType) {
             "audio/wav", "audio/x-wav" -> AudioMimeType.WAV
@@ -58,4 +105,36 @@ class SharedSampleViewModel @Inject constructor(
             else -> throw IllegalArgumentException("Unsupported audio mime type: $mimeType")
         }
     }
+
+    private fun mapMimeTypeToImageMimeType(mimeType: String?): ImageMimeType {
+        return when (mimeType) {
+            "image/png" -> ImageMimeType.PNG
+            "image/jpeg", "image/jpg" -> ImageMimeType.JPEG
+            "image/webp" -> ImageMimeType.WEBP
+            else -> throw IllegalArgumentException("Unsupported image mime type: $mimeType")
+        }
+    }
+
+    suspend fun getMimeTypeFromUrl(urlString: String): String {
+        val extension = MimeTypeMap.getFileExtensionFromUrl(urlString)
+        if (extension.isNotEmpty()) {
+            MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)?.let {
+                return it
+            }
+        }
+
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL(urlString)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "HEAD"
+                connection.connect()
+                connection.contentType ?: "image/*"
+            } catch (e: Exception) {
+                Log.e("SharedSampleViewModel", "Failed to get mime type from URL: $urlString", e)
+                "image/*"
+            }
+        }
+    }
+
 }

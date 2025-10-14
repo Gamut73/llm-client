@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import org.artificery.llmclientsample.MainActivity
 
 @Composable
 fun HomeScreen(
@@ -20,7 +21,7 @@ fun HomeScreen(
         ) {
             Button(
                 onClick = {
-                    navController.navigate("textPrompt")
+                    navController.navigate(MainActivity.Companion.NavRoutes.TEXT_PROMPT)
                 },
                 modifier = Modifier.padding(16.dp)
             ) {
@@ -28,11 +29,21 @@ fun HomeScreen(
             }
             Button(
                 onClick = {
-                    navController.navigate("transcription")
+                    navController.navigate(MainActivity.Companion.NavRoutes.TRANSCRIPTION)
                 },
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text("Go to Transcription Screen")
+            }
+            Button(
+                onClick = {
+                    navController.navigate(
+                        MainActivity.Companion.NavRoutes.TEXT_WITH_IMAGES_PROMPT_SAMPLE
+                    )
+                },
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Go to TextWithImagesPrompt Screen")
             }
         }
 

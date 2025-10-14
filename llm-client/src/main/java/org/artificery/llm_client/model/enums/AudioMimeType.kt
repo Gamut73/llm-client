@@ -1,4 +1,4 @@
-package org.artificery.llm_client.model
+package org.artificery.llm_client.model.enums
 
 enum class AudioMimeType(val mimeType: String) {
     WAV("audio/wav"),
