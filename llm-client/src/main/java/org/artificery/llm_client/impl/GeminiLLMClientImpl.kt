@@ -107,8 +107,9 @@ class GeminiLLMClientImpl(
             .parts(parts)
             .build()
 
+        val model = prompt.model ?: config.model.modelName
         val generateContentResponse = geminiClient.models.generateContent(
-            prompt.model ?: config.model.modelName,
+            model,
             content,
             null
         )
@@ -141,4 +142,6 @@ enum class GeminiModel(val modelName: String) {
     GEMINI_2_5_FLASH_LITE("gemini-2.5-flash-lite"),
     GEMINI_2_0_FLASH("gemini-2.0-flash"),
     GEMINI_2_0_FLASH_LITE("gemini-2.0-flash-lite"),
+    GEMINI_2_5_FLASH_IMAGE("gemini-2.5-flash-image"),
+    GEMINI_3_PRO_IMAGE_PREVIEW("gemini-3-pro-image-preview")
 }

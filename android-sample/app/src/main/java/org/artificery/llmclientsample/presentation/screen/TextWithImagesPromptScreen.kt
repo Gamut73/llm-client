@@ -1,20 +1,24 @@
 package org.artificery.llmclientsample.presentation.screen
 
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,11 +34,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.launch
+import org.artificery.llm_client.model.ImageResponse
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llmclientsample.presentation.viewmodel.SharedSampleViewModel
 
@@ -50,6 +58,8 @@ fun TextWithImagesPromptScreen(
     val imageUrls = remember { mutableStateListOf<String>() }
     val imageUris = remember { mutableStateListOf<Uri>() }
     var responseText by remember { mutableStateOf("") }
+    var imageResponse by remember { mutableStateOf<ImageResponse?>(null) }
+    var isImageResponse by remember { mutableStateOf(false) }
     var isProcessing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -166,19 +176,49 @@ fun TextWithImagesPromptScreen(
                 }
             }
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = isImageResponse,
+                    onCheckedChange = { isImageResponse = it },
+                    enabled = !isProcessing
+                )
+                Text(
+                    text = "Request image response",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
             Button(
                 onClick = {
                     isProcessing = true
                     responseText = "Processing..."
+                    imageResponse = null
                     scope.launch {
                         try {
-                            val result = viewModel.textWithImagesPrompt(
-                                prompt = TextPrompt(promptText),
-                                imageUrls = imageUrls.toList(),
-                                imagesURIs = imageUris,
-                                contentResolver = context.contentResolver
-                            )
-                            responseText = result
+                            if (isImageResponse) {
+                                val result = viewModel.textWithImagesPromptForImageResponse(
+                                    prompt = TextPrompt(promptText),
+                                    imageUrls = imageUrls.toList(),
+                                    imagesURIs = imageUris,
+                                    contentResolver = context.contentResolver
+                                )
+                                imageResponse = result
+                                responseText = when (result) {
+                                    is ImageResponse.Success -> "Image generated successfully"
+                                    is ImageResponse.Error -> "Error: ${result.message}"
+                                }
+                            } else {
+                                val result = viewModel.textWithImagesPrompt(
+                                    prompt = TextPrompt(promptText),
+                                    imageUrls = imageUrls.toList(),
+                                    imagesURIs = imageUris,
+                                    contentResolver = context.contentResolver
+                                )
+                                responseText = result
+                            }
                         } catch (e: Exception) {
                             responseText = "Error: ${e.message}"
                         } finally {
@@ -201,6 +241,28 @@ fun TextWithImagesPromptScreen(
                     text = responseText,
                     style = MaterialTheme.typography.bodyMedium
                 )
+            }
+
+            (imageResponse as? ImageResponse.Success)?.let { successResponse ->
+                successResponse.imageByteArrays.forEachIndexed { index, byteArray ->
+                    val bitmap = remember(byteArray) {
+                        BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+                    }
+                    bitmap?.let {
+                        Text(
+                            text = "Generated Image ${index + 1}:",
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = "Generated image ${index + 1}",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 400.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                }
             }
         }
     }
