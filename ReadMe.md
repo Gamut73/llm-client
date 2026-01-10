@@ -26,7 +26,7 @@ Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("io.github.gamut73:llm_client:1.0.0")
+    implementation("io.github.gamut73:llm_client:<some-version>")
 }
 ```
 
@@ -38,7 +38,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
     <groupId>io.github.gamut73</groupId>
     <artifactId>llm_client</artifactId>
-    <version>1.0.0</version>
+    <version><some-version></version>
 </dependency>
 ```
 
