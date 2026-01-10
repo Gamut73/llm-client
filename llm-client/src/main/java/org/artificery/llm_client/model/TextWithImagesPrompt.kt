@@ -6,6 +6,7 @@ data class TextWithImagesPrompt(
     val text: String,
     val imagesFromUrls: List<ImageFromUrl>,
     val imagesBytes: List<ImageFromBytes> = emptyList(),
+    val model: String? = null,
 )
 
 data class ImageFromUrl(

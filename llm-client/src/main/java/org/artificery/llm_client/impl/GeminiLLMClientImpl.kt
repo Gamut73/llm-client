@@ -4,6 +4,7 @@ import com.google.genai.Client
 import com.google.genai.types.Content
 import com.google.genai.types.Part
 import org.artificery.llm_client.LLMClient
+import org.artificery.llm_client.model.ImageResponse
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
 import org.artificery.llm_client.model.TextWithImagesPrompt
@@ -83,6 +84,49 @@ class GeminiLLMClientImpl(
         } else {
             TextResponse.Success(transcriptionResponse.text() ?: "")
         }
+    }
+
+    override fun getImageResponseFromTextWithImagesPrompt(
+        prompt: TextWithImagesPrompt
+    ): ImageResponse {
+        val parts = mutableListOf<Part>()
+        parts.add(Part.fromText(prompt.text))
+        prompt.imagesFromUrls.forEach { imageFromUrl ->
+            val url = URI(imageFromUrl.imageUrl).toURL()
+            parts.add(
+                Part.fromBytes(url.readBytes(), imageFromUrl.mimeType.mimeType)
+            )
+        }
+        prompt.imagesBytes.forEach { imageFromBytes ->
+            parts.add(
+                Part.fromBytes(imageFromBytes.imageBytes, imageFromBytes.mimeType.mimeType)
+            )
+        }
+        val content = Content.builder()
+            .role("user")
+            .parts(parts)
+            .build()
+
+        val generateContentResponse = geminiClient.models.generateContent(
+            prompt.model ?: config.model.modelName,
+            content,
+            null
+        )
+
+        generateContentResponse.parts()?.let { parts ->
+            val outputByteArrays = parts.filter { it.inlineData().isPresent }
+                .map { part -> part.inlineData().get() }
+                .filter { blob -> blob.data().isPresent }
+                .map { blob -> blob.data().get() }
+                .toList()
+            return ImageResponse.Success(
+                imageByteArrays = outputByteArrays
+            )
+        }
+
+        return ImageResponse.Error(
+            "Image(s) could not be generated\n ${generateContentResponse.text() ?: "No llm text response"}"
+        )
     }
 }
 
