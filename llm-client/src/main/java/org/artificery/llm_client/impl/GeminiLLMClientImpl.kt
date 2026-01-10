@@ -4,11 +4,11 @@ import com.google.genai.Client
 import com.google.genai.types.Content
 import com.google.genai.types.Part
 import org.artificery.llm_client.LLMClient
+import org.artificery.llm_client.model.AudioTranscriptionPrompt
 import org.artificery.llm_client.model.ImageResponse
 import org.artificery.llm_client.model.TextPrompt
 import org.artificery.llm_client.model.TextResponse
 import org.artificery.llm_client.model.TextWithImagesPrompt
-import org.artificery.llm_client.model.enums.AudioMimeType
 import org.artificery.llm_client.model.toStringPrompt
 import java.net.URI
 
@@ -19,7 +19,7 @@ class GeminiLLMClientImpl(
 
     override fun getTextResponseFromTextPrompt(prompt: TextPrompt): TextResponse {
         val generateContent = geminiClient.models.generateContent(
-            config.model.modelName,
+            prompt.model ?: config.model.defaultModel,
             prompt.toStringPrompt(),
             null
         )
@@ -53,7 +53,7 @@ class GeminiLLMClientImpl(
             .build()
 
         val generateContent = geminiClient.models.generateContent(
-            config.model.modelName,
+            prompt.model ?: config.model.defaultModel,
             content,
             null
         )
@@ -65,8 +65,8 @@ class GeminiLLMClientImpl(
         }
     }
 
-    override fun transcribeAudioToText(audioBytes: ByteArray, audioMimeType: AudioMimeType): TextResponse {
-        val audioPart = Part.fromBytes(audioBytes, audioMimeType.mimeType)
+    override fun transcribeAudioToText(prompt: AudioTranscriptionPrompt): TextResponse {
+        val audioPart = Part.fromBytes(prompt.audioBytes, prompt.audioMimeType.mimeType)
         val textPart = Part.fromText("Transcribe the audio to text.")
         val content = Content.builder()
             .role("user")
@@ -74,7 +74,7 @@ class GeminiLLMClientImpl(
             .build()
 
         val transcriptionResponse = geminiClient.models.generateContent(
-            config.model.modelName,
+            prompt.model ?: config.model.defaultModel,
             content,
             null
         )
@@ -107,7 +107,7 @@ class GeminiLLMClientImpl(
             .parts(parts)
             .build()
 
-        val model = prompt.model ?: config.model.modelName
+        val model = prompt.model ?: config.model.defaultModel
         val generateContentResponse = geminiClient.models.generateContent(
             model,
             content,
@@ -136,7 +136,7 @@ data class GeminiLLMClientConfig(
     val model: GeminiModel,
 )
 
-enum class GeminiModel(val modelName: String) {
+enum class GeminiModel(val defaultModel: String) {
     GEMINI_2_5_PRO("gemini-2.5-pro"),
     GEMINI_2_5_FLASH("gemini-2.5-flash"),
     GEMINI_2_5_FLASH_LITE("gemini-2.5-flash-lite"),

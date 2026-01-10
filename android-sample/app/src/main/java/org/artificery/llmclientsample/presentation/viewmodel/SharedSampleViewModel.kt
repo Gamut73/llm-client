@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.artificery.llm_client.LLMClient
 import org.artificery.llm_client.impl.GeminiModel
+import org.artificery.llm_client.model.AudioTranscriptionPrompt
 import org.artificery.llm_client.model.ImageFromBytes
 import org.artificery.llm_client.model.ImageFromUrl
 import org.artificery.llm_client.model.ImageResponse
@@ -73,7 +74,7 @@ class SharedSampleViewModel @Inject constructor(
                     text = prompt.text,
                     imagesFromUrls = imagesFromUrls,
                     imagesBytes = imagesBytes,
-                    model = GeminiModel.GEMINI_2_5_FLASH_IMAGE.modelName
+                    model = GeminiModel.GEMINI_2_5_FLASH_IMAGE.defaultModel
                 )
             )
         }
@@ -108,8 +109,11 @@ class SharedSampleViewModel @Inject constructor(
             val audioBytes = getBytesFromUri(contentResolver, audioFileUri)
 
             llmClient.transcribeAudioToText(
-                audioBytes,
-                mapMimeTypeToAudioMimeType(contentResolver.getType(audioFileUri))
+                AudioTranscriptionPrompt(
+                    audioBytes = audioBytes,
+                    audioMimeType = mapMimeTypeToAudioMimeType(
+                        contentResolver.getType(audioFileUri))
+                )
             )
         }
         return when (response) {
