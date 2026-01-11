@@ -19,7 +19,7 @@ class GeminiLLMClientImpl(
 
     override fun getTextResponseFromTextPrompt(prompt: TextPrompt): TextResponse {
         val generateContent = geminiClient.models.generateContent(
-            prompt.model ?: config.model.defaultModel,
+            prompt.model ?: config.defaultModel.modelName,
             prompt.toStringPrompt(),
             null
         )
@@ -53,7 +53,7 @@ class GeminiLLMClientImpl(
             .build()
 
         val generateContent = geminiClient.models.generateContent(
-            prompt.model ?: config.model.defaultModel,
+            prompt.model ?: config.defaultModel.modelName,
             content,
             null
         )
@@ -74,7 +74,7 @@ class GeminiLLMClientImpl(
             .build()
 
         val transcriptionResponse = geminiClient.models.generateContent(
-            prompt.model ?: config.model.defaultModel,
+            prompt.model ?: config.defaultModel.modelName,
             content,
             null
         )
@@ -107,7 +107,7 @@ class GeminiLLMClientImpl(
             .parts(parts)
             .build()
 
-        val model = prompt.model ?: config.model.defaultModel
+        val model = prompt.model ?: config.defaultModel.modelName
         val generateContentResponse = geminiClient.models.generateContent(
             model,
             content,
@@ -133,10 +133,10 @@ class GeminiLLMClientImpl(
 
 data class GeminiLLMClientConfig(
     val apiKey: String,
-    val model: GeminiModel,
+    val defaultModel: GeminiModels,
 )
 
-enum class GeminiModel(val defaultModel: String) {
+enum class GeminiModels(val modelName: String) {
     GEMINI_2_5_PRO("gemini-2.5-pro"),
     GEMINI_2_5_FLASH("gemini-2.5-flash"),
     GEMINI_2_5_FLASH_LITE("gemini-2.5-flash-lite"),

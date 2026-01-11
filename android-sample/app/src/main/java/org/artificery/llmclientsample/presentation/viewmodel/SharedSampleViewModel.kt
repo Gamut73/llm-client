@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.artificery.llm_client.LLMClient
-import org.artificery.llm_client.impl.GeminiModel
+import org.artificery.llm_client.impl.GeminiModels
 import org.artificery.llm_client.model.AudioTranscriptionPrompt
 import org.artificery.llm_client.model.ImageFromBytes
 import org.artificery.llm_client.model.ImageFromUrl
@@ -74,7 +74,7 @@ class SharedSampleViewModel @Inject constructor(
                     text = prompt.text,
                     imagesFromUrls = imagesFromUrls,
                     imagesBytes = imagesBytes,
-                    model = GeminiModel.GEMINI_2_5_FLASH_IMAGE.defaultModel
+                    model = GeminiModels.GEMINI_2_5_FLASH_IMAGE.modelName
                 )
             )
         }
