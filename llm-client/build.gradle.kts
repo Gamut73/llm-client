@@ -18,7 +18,7 @@ dependencies {
 }
 
 mavenPublishing {
-    coordinates("io.github.gamut73", "llm_client", "1.1.0")
+    coordinates("io.github.gamut73", "llm_client", "1.1.1")
 
     pom {
         name.set("LLM Client Library")
