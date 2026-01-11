@@ -26,7 +26,7 @@ Add the dependency to your `build.gradle.kts`:
 
 ```kotlin
 dependencies {
-    implementation("io.github.gamut73:llm_client:<some-version>")
+    implementation("io.github.gamut73:llm_client:1.1.1")
 }
 ```
 
@@ -38,7 +38,7 @@ Add the dependency to your `pom.xml`:
 <dependency>
     <groupId>io.github.gamut73</groupId>
     <artifactId>llm_client</artifactId>
-    <version><some-version></version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
@@ -51,7 +51,7 @@ Currently, only Gemini is supported. Create a client instance:
 ```kotlin
 val config = GeminiLLMClientConfig(
     apiKey = "YOUR_GEMINI_API_KEY",
-    model = GeminiModel.GEMINI_1_5_FLASH
+    defaultModel = GeminiModel.GEMINI_2_5_FLASH
 )
 
 val llmClient: LLMClient = GeminiLLMClientImpl(config)
