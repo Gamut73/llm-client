@@ -1,7 +1,7 @@
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.36.0"
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -15,6 +15,8 @@ kotlin {
 
 dependencies {
     implementation(libs.google.genai)
+    implementation(project(":ollama-client"))
+    implementation(libs.kotlinx.coroutines.core)
 }
 
 mavenPublishing {

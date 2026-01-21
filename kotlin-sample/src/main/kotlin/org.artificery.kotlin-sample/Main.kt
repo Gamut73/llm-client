@@ -7,7 +7,9 @@ import org.artificery.llm_client.model.TextResponse
 
 fun main() {
     runBlocking {
-        val llmClient = OllamaLLMClientImpl()
+        val llmClient = OllamaLLMClientImpl(
+            defaultModel = "gemma3",
+        )
 
         val prompt = TextPrompt(
             text = "What is 1+1?"
