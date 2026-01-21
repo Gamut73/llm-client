@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "LLM Client"
 include(":android-sample:app")
 include(":llm-client")
+include(":kotlin-sample")

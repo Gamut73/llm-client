@@ -37,7 +37,7 @@ mavenPublishing {
             developer {
                 id.set("Gamut73")
                 name.set("Fitzcaraldo")
-                email.set("lilwaltmus@gmail.com")
+                email.set("the.28th.artificery@gmail.com")
             }
         }
 
