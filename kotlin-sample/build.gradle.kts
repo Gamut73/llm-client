@@ -27,7 +27,9 @@ tasks {
             listOf(
                 "compileJava",
                 "compileKotlin",
-                "processResources"
+                "processResources",
+                ":llm-client:jar",
+                ":ollama-client:jar",
             )
         )
         archiveClassifier.set("llm-client-kotlin-cli-sample")
