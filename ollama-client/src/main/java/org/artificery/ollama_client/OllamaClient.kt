@@ -59,7 +59,7 @@ class OllamaClientImpl(
     private suspend inline fun <reified T : Any> processResponse(response: HttpResponse): T {
         if (response.status != HttpStatusCode.OK) {
             //TODO: better error handling
-            throw Exception("Request failed with status: ${response.status} and body: ${response.body<String>()}")
+            throw Exception("Request failed with status:\n ${response.status}\nbody:\n ${response.body<String>()}")
         }
         return response.body<String>()
             .decodeFromString<T>()

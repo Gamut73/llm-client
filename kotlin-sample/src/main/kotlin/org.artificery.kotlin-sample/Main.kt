@@ -25,7 +25,7 @@ fun main() {
 
         PromptType.TEXT_TO_IMAGE -> {
             val llmClient = OllamaLLMClientImpl(defaultModel = model)
-            textAndImages2TextPromptForImageExample(llmClient)
+            text2ImagePromptExample(llmClient)
         }
 
         PromptType.TEXT_AND_IMAGES_TO_TEXT -> {
@@ -39,19 +39,13 @@ fun main() {
     }
 }
 
-private fun textAndImages2TextPromptForImageExample(
+private fun text2ImagePromptExample(
     llmClient: OllamaLLMClientImpl,
 ) {
     val prompt = userInputForPrompt()
-    val imageUrl = userInputForImageUrl()
+
     val textWithImagesPrompt = TextWithImagesPrompt(
         text = prompt,
-        imagesFromUrls = listOf(
-            ImageFromUrl(
-                imageUrl = imageUrl,
-                mimeType = ImageMimeType.JPEG
-            )
-        ),
     )
 
     llmClient.getImageResponseFromTextWithImagesPrompt(textWithImagesPrompt).let { response ->
@@ -77,7 +71,7 @@ private fun textAndImages2TextPromptExample(
         imagesFromUrls = listOf(
             ImageFromUrl(
                 imageUrl = imageUrl,
-                mimeType = ImageMimeType.JPEG
+                mimeType = detirmineImageMimeTypeFromUrl(imageUrl)
             )
         ),
     )
@@ -92,6 +86,17 @@ private fun textAndImages2TextPromptExample(
                 println("Error: ${response.message}")
             }
         }
+    }
+}
+
+private fun detirmineImageMimeTypeFromUrl(imageUrl: String): ImageMimeType {
+    return when {
+        imageUrl.endsWith(".png", ignoreCase = true) -> ImageMimeType.PNG
+        imageUrl.endsWith(".jpeg", ignoreCase = true) || imageUrl.endsWith(
+            ".jpg",
+            ignoreCase = true
+        ) -> ImageMimeType.JPEG
+        else -> ImageMimeType.JPEG
     }
 }
 

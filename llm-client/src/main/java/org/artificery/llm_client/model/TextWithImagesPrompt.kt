@@ -4,7 +4,7 @@ import org.artificery.llm_client.model.enums.ImageMimeType
 
 data class TextWithImagesPrompt(
     val text: String,
-    val imagesFromUrls: List<ImageFromUrl>,
+    val imagesFromUrls: List<ImageFromUrl> = emptyList(),
     val imagesBytes: List<ImageFromBytes> = emptyList(),
     val model: String? = null,
 )
