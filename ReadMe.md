@@ -8,7 +8,8 @@ LLM-Client is a Kotlin library that offers a consistent API for interacting with
 
 ## Supported Providers
 
-- **Gemini API**
+- **[Gemini API](https://ai.google.dev/gemini-api/docs)**
+- **[Ollama](https://ollama.com/)**
 
 ## Features
 
@@ -46,16 +47,27 @@ Add the dependency to your `pom.xml`:
 
 ### 1. Initialize the Client
 
-Currently, only Gemini is supported. Create a client instance:
+Currently, only Gemini, and Ollama have implementations. Create a client instance:
 
+##### Gemini
 ```kotlin
 val config = GeminiLLMClientConfig(
     apiKey = "YOUR_GEMINI_API_KEY",
-    defaultModel = GeminiModel.GEMINI_2_5_FLASH
+    defaultModel = "<model_name>" // e.g. "gemini-2.5-flash"
 )
 
 val llmClient: LLMClient = GeminiLLMClientImpl(config)
 ```
+
+##### Ollama
+```kotlin
+val config = OllamaLLMClientConfig(
+    baseUrl = "http://localhost:11434",
+    defaultModel = "<model_name>" // whatever model you have downloaded, e.g. "llama2"
+)
+val llmClient: LLMClient = OllamaLLMClientImpl(config)
+```
+
 ## Requirements
 
 - Kotlin 1.9+
