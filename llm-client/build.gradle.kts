@@ -15,7 +15,7 @@ kotlin {
 
 dependencies {
     implementation(libs.google.genai)
-    implementation(project(":ollama-client"))
+    api(project(":ollama-client"))
     implementation(libs.kotlinx.coroutines.core)
 }
 

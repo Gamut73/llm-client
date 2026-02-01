@@ -10,4 +10,5 @@ data class GenerateResponse(
     @SerialName("response") val response: String,
     @SerialName("done") val done: Boolean,
     @SerialName("done_reason") val doneReason: String? = null,
+    @SerialName("image") val image: String? = null,
 )

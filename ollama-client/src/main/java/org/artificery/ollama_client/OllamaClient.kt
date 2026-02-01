@@ -7,6 +7,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import org.artificery.ollama_client.model.ChatRequest
@@ -56,6 +57,10 @@ class OllamaClientImpl(
         }
 
     private suspend inline fun <reified T : Any> processResponse(response: HttpResponse): T {
+        if (response.status != HttpStatusCode.OK) {
+            //TODO: better error handling
+            throw Exception("Request failed with status: ${response.status} and body: ${response.body<String>()}")
+        }
         return response.body<String>()
             .decodeFromString<T>()
             .getOrThrow()
