@@ -1,7 +1,13 @@
+val libraryGroupId: String by extra
+val libraryVersion: String by extra
+val developerId: String by extra
+val developerName: String by extra
+val developerEmail: String by extra
+
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
-    id("com.vanniktech.maven.publish") version "0.36.0"
+    id("com.vanniktech.maven.publish")
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -20,10 +26,10 @@ dependencies {
 }
 
 mavenPublishing {
-    coordinates("io.github.gamut73", "llm_client", "1.1.1")
+    coordinates(libraryGroupId, "llm_client", libraryVersion)
 
     pom {
-        name.set("LLM Client Library")
+        name.set("Kotlin LLM Client Library")
         description.set("Kotlin library for different llm implementations")
         inceptionYear.set("2025")
         url.set("https://github.com/Gamut73/llm-client")
@@ -37,9 +43,9 @@ mavenPublishing {
 
         developers {
             developer {
-                id.set("Gamut73")
-                name.set("Fitzcaraldo")
-                email.set("the.28th.artificery@gmail.com")
+                id.set(developerId)
+                name.set(developerName)
+                email.set(developerEmail)
             }
         }
 
