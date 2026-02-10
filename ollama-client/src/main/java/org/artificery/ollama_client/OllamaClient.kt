@@ -26,7 +26,7 @@ interface OllamaClient {
 class OllamaClientImpl(
     private val config: OllamaClientConfig,
     private val httpClient: HttpClient = HttpClient(
-        CIO.create { requestTimeout = 300_000 }
+        CIO.create { requestTimeout = config.requestTimeout }
     )
 ) : OllamaClient {
     override suspend fun generate(generateRequest: GenerateRequest): GenerateResponse {

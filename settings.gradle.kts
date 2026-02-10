@@ -28,7 +28,7 @@ include(":ollama-client")
 
 gradle.beforeProject {
     extra["libraryGroupId"] = "io.github.gamut73"
-    extra["libraryVersion"] = "1.2.4"
+    extra["libraryVersion"] = "1.2.5"
     extra["developerId"] = "Gamut73"
     extra["developerName"] = "Fitzcaraldo"
     extra["developerEmail"] = "the.28th.artificery@gmail.com"
